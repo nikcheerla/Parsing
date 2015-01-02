@@ -40,7 +40,7 @@ class LoginViewController: UIViewController/*,UITextFieldDelegate*/ {
         return true;
     }*/
 
-    
+     
     @IBAction func SignUpClicked(sender: AnyObject) {
        print("clickeds")
         if(SignUpUserText.text==""||SignUpPassText.text==""||SignUpPass2Text.text==""||(SignUpPassText.text != SignUpPass2Text.text))
