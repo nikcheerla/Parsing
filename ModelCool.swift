@@ -64,7 +64,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
     func download(){
         var query = PFQuery(className: "Clamor");
         
-        query.orderByAscending("rating");
+        query.orderByDescending("rating");
         query.findObjectsInBackgroundWithBlock {
             (objects: [AnyObject]!, error: NSError!) -> Void in
             if error == nil {
@@ -98,8 +98,17 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         }
     }
     func like(ind : Int){
+        println("Liking \(ind)");
         var query = PFQuery(className: "Clamor");
-        query.getObjectWithId(ids[ind]).incrementKey("rating");
+        
+        if(ind < 0 || ind >= ids.count){
+            return;
+        }
+        println(ids[ind]);
+        var obj = query.getObjectWithId(ids[ind])
+        obj.incrementKey("rating");
+        obj.save();
+        println(obj["rating"]);
     }
     func like(content : String){
         var i = 0;
