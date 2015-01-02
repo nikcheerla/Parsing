@@ -25,6 +25,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         var content = field.text;
         field.text = "";
         model.upload(content, radius: 0.75);
+        model.download();
     }
 }
 

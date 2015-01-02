@@ -12,9 +12,9 @@ import Foundation
 
 class ModelCool: NSObject, CLLocationManagerDelegate {
     let locationManager = CLLocationManager();
-    var curloc = CLLocation();
-    var newcontent;
-    var
+    var curloc = PFGeoPoint();
+    var contentList: [String] = [];
+    var ratingsList: [Int] = [];
     init(locate: Bool){
         super.init();
         if (CLLocationManager.locationServicesEnabled()) {
@@ -37,7 +37,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
             if placemarks.count > 0 {
                 let pm = placemarks[0] as CLPlacemark
                 self.displayLocationInfo(pm);
-                self.curloc = pm.location;
+                self.curloc = PFGeoPoint(location: pm.location);
             } else {
                 println("Problem with the data received from geocoder")
             }
@@ -56,7 +56,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         clam["content"] = content
         clam["rating"] = 5;
         clam["radius"] = radius;
-        clam["Location"] = PFGeoPoint(location: curloc);
+        clam["Location"] = curloc;
         clam["user"] = PFUser.currentUser();
         clam.save()
     }
@@ -70,9 +70,22 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
                 // The find succeeded.
                 NSLog("Successfully retrieved \(objects.count) scores.")
                 // Do something with the found objects
+                self.contentList = [];
+                self.ratingsList = [];
                 for object in objects {
-                    NSLog("%@", object.objectId)
+                    var rating = object["rating"] as Int;
+                    var content = object["content"] as String;
+                    var radius = object["radius"] as Double;
+                    var remote = object["Location"] as PFGeoPoint;
+                    
+                    var dist = remote.distanceInKilometersTo(self.curloc);
+                    if(dist < radius){
+                        self.contentList.append(content);
+                        self.ratingsList.append(rating);
+                    }
                 }
+                println(self.contentList);
+                println(self.ratingsList);
             } else {
                 // Log details of the failure
                 NSLog("Error: %@ %@", error, error.userInfo!)
