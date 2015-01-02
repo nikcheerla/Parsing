@@ -15,6 +15,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
     var curloc = PFGeoPoint();
     var contentList: [String] = [];
     var ratingsList: [Int] = [];
+    var ids: [String] = [];
     init(locate: Bool){
         super.init();
         if (CLLocationManager.locationServicesEnabled()) {
@@ -72,6 +73,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
                 // Do something with the found objects
                 self.contentList = [];
                 self.ratingsList = [];
+                self.ids = [];
                 for object in objects {
                     var rating = object["rating"] as Int;
                     var content = object["content"] as String;
@@ -82,14 +84,31 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
                     if(dist < radius){
                         self.contentList.append(content);
                         self.ratingsList.append(rating);
+                        self.ids.append(object.objectId);
                     }
                 }
+                println("\(self.contentList.count) scores in range");
                 println(self.contentList);
                 println(self.ratingsList);
+                println(self.ids);
             } else {
                 // Log details of the failure
                 NSLog("Error: %@ %@", error, error.userInfo!)
             }
+        }
+    }
+    func like(ind : Int){
+        var query = PFQuery(className: "Clamor");
+        query.getObjectWithId(ids[ind]).incrementKey("rating");
+    }
+    func like(content : String){
+        var i = 0;
+        for c in contentList {
+            if(c == content) {
+                like(c);
+                return;
+            }
+            i++;
         }
     }
     // MARK: - CoreLocation Delegate Methods
