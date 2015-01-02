@@ -27,6 +27,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         model.upload(content, radius: 0.75);
         model.download();
         model.like(0);
+        println("Comments: ");
+        println(model.getComments(0));
+        var rnd = random();
+        model.comment("I like pie \(rnd)", ind: 0);
     }
 }
 

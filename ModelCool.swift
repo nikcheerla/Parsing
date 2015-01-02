@@ -59,6 +59,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         clam["radius"] = radius;
         clam["Location"] = curloc;
         clam["user"] = PFUser.currentUser();
+        clam["comments"] = [];
         clam.save()
     }
     func download(){
@@ -87,10 +88,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
                         self.ids.append(object.objectId);
                     }
                 }
-                println("\(self.contentList.count) scores in range");
-                println(self.contentList);
-                println(self.ratingsList);
-                println(self.ids);
+                
             } else {
                 // Log details of the failure
                 NSLog("Error: %@ %@", error, error.userInfo!)
@@ -98,23 +96,92 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         }
     }
     func like(ind : Int){
-        println("Liking \(ind)");
         var query = PFQuery(className: "Clamor");
         
         if(ind < 0 || ind >= ids.count){
             return;
         }
-        println(ids[ind]);
         var obj = query.getObjectWithId(ids[ind])
         obj.incrementKey("rating");
         obj.save();
-        println(obj["rating"]);
     }
     func like(content : String){
         var i = 0;
         for c in contentList {
             if(c == content) {
-                like(c);
+                like(i);
+                return;
+            }
+            i++;
+        }
+    }
+    func downvote(ind: Int){
+        var query = PFQuery(className: "Clamor");
+        
+        if(ind < 0 || ind >= ids.count){
+            return;
+        }
+        var obj = query.getObjectWithId(ids[ind])
+        obj.incrementKey("rating", byAmount: -1);
+        obj.save();
+    }
+    func downvote(content : String){
+        var i = 0;
+        for c in contentList {
+            if(c == content) {
+                downvote(i);
+                return;
+            }
+            i++;
+        }
+    }
+    func getComments(ind: Int) -> Array<String>{
+        var query = PFQuery(className: "Clamor");
+        
+        if(ind < 0 || ind >= ids.count){
+            return [];
+        }
+        var obj = query.getObjectWithId(ids[ind]);
+        return obj["comments"] as Array<String>;
+    }
+    func getComments(content: String) -> Array<String>{
+        var i = 0;
+        for c in contentList {
+            if(c == content) {
+                return getComments(i);
+            }
+            i++;
+        }
+        return [];
+    }
+    func comment(comment: String, ind: Int){
+        var query = PFQuery(className: "Clamor");
+        if(ind < 0 || ind >= ids.count){
+            return;
+        }
+        var obj = query.getObjectWithId(ids[ind]);
+        var strarr = (obj["comments"] as Array<String>);
+        strarr.append(comment);
+        obj["comments"] = strarr;
+        var obj2 = obj["user"] as PFObject;
+        
+        var arr = obj2.fetchIfNeeded();
+        
+        if  ( arr != nil && (arr["comments"] as Array<String>).count != 0){
+            strarr = (arr["comments"] as Array<String>);
+            strarr.append(comment);
+            arr["comments"] = strarr;
+        }
+        
+        
+        obj.save();
+        obj2.save();
+    }
+    func comment(com: String, content: String){
+        var i = 0;
+        for c in contentList {
+            if(c == content) {
+                comment(com, ind: i);
                 return;
             }
             i++;
