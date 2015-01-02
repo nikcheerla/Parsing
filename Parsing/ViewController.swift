@@ -7,19 +7,24 @@
 //
 
 import UIKit
+import CoreLocation
 
-class ViewController: UIViewController {
-
+class ViewController: UIViewController, CLLocationManagerDelegate {
+    @IBOutlet weak var field: UITextField!
+    let locationManager = CLLocationManager();
+    var model: ModelCool = ModelCool(locate: false);
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        super.viewDidLoad();
+        model = ModelCool(locate: true);
     }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
+    @IBAction func pressed(sender: AnyObject) {
+        var content = field.text;
+        field.text = "";
+        model.upload(content, radius: 0.75);
+    }
 }
 
