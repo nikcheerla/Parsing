@@ -103,6 +103,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         }
         var obj = query.getObjectWithId(ids[ind])
         obj.incrementKey("rating");
+        obj.incrementKey("radius");
         obj.save();
     }
     func like(content : String){
@@ -123,6 +124,7 @@ class ModelCool: NSObject, CLLocationManagerDelegate {
         }
         var obj = query.getObjectWithId(ids[ind])
         obj.incrementKey("rating", byAmount: -1);
+        obj.incrementKey("radius", byAmount: -1);
         obj.save();
     }
     func downvote(content : String){
